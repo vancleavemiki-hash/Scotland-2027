@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F1EADA">
+<title>Scotland 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1EADA; --paper-line:#D9CDAE; --ink:#2B2A24; --ink-soft:#6B6552;
+    --loch:#2C5F6E; --moor:#4A6741; --trail:#B8511D; --gold:#A6812E; --done:#7C8A6B;
+    --card:rgba(255,255,255,0.4);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body,#root{margin:0;padding:0;}
+  body{
+    background: repeating-linear-gradient(0deg, transparent 0 38px, rgba(107,101,82,0.05) 39px 40px), var(--paper);
+    color:var(--ink); font-family:'Inter',sans-serif; line-height:1.5; padding-bottom:60px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:22px 18px 40px;}
+  header{border-bottom:2px solid var(--ink);padding-bottom:16px;}
+  .kicker{font-size:12.5px;color:var(--loch);font-weight:600;margin-bottom:5px;letter-spacing:.02em;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin:0 0 6px;letter-spacing:-.01em;}
+  .subtitle{color:var(--ink-soft);font-size:14.5px;}
+  .countdown{font-size:13px;color:var(--trail);font-weight:600;margin-top:8px;}
+
+  .tabs{display:flex;border-bottom:2px solid var(--ink);margin-bottom:22px;position:sticky;top:0;background:var(--paper);z-index:10;}
+  .tab{flex:1;padding:13px 8px;text-align:center;cursor:pointer;user-select:none;font-weight:600;font-size:14px;color:var(--ink-soft);border:1px solid transparent;border-bottom:none;background:transparent;font-family:inherit;}
+  .tab.active{color:var(--ink);background:var(--card);border-color:var(--ink);border-bottom:2px solid var(--paper);margin-bottom:-2px;}
+
+  h2{font-family:'Fraunces',serif;font-weight:600;font-size:20px;margin:0 0 4px;}
+  .note{font-size:13px;color:var(--ink-soft);margin-bottom:16px;}
+
+  .progress-row{display:flex;align-items:center;gap:11px;margin:14px 0 22px;}
+  .progress-track{flex:1;height:8px;background:var(--paper-line);border:1px solid var(--ink);overflow:hidden;}
+  .progress-fill{height:100%;background:var(--moor);transition:width .35s ease;}
+  .progress-label{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+  .book-card{border:1px solid var(--ink);border-left:4px solid var(--trail);background:var(--card);padding:13px 15px;margin-bottom:9px;display:flex;gap:11px;}
+  .book-card.checked{border-left-color:var(--done);opacity:.58;}
+  .book-card.checked .book-title{text-decoration:line-through;}
+  .check{flex-shrink:0;width:21px;height:21px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--moor);font-weight:700;}
+  .check.on{background:var(--moor);border-color:var(--moor);color:var(--paper);}
+  .book-body{flex:1;min-width:0;}
+  .book-top{display:flex;justify-content:space-between;align-items:baseline;gap:9px;flex-wrap:wrap;}
+  .book-title{font-weight:600;font-size:15px;}
+  .deadline{font-size:11px;font-weight:700;padding:2px 7px;white-space:nowrap;border:1px solid currentColor;}
+  .deadline.urgent{color:var(--trail);} .deadline.soon{color:var(--gold);} .deadline.flex{color:var(--moor);}
+  .book-desc{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+  .book-desc b{color:var(--ink);font-weight:600;}
+  a{color:var(--loch);font-weight:600;text-decoration:none;border-bottom:1px solid var(--loch);}
+
+  .conf{border:1px solid var(--ink);background:var(--card);padding:13px 15px;margin-bottom:9px;}
+  .conf-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .conf-title{font-weight:600;font-size:15px;}
+  .conf-cat{font-size:11px;font-weight:700;color:var(--loch);border:1px solid var(--loch);padding:2px 7px;white-space:nowrap;}
+  .conf-num{font-family:ui-monospace,Menlo,monospace;font-size:15px;margin-top:6px;word-break:break-all;}
+  .conf-meta{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
+  .conf-actions{margin-top:8px;display:flex;gap:8px;}
+  .mini{font-size:12px;padding:4px 10px;border:1px solid var(--ink-soft);background:transparent;color:var(--ink-soft);cursor:pointer;font-family:inherit;}
+
+  .form{border:1px dashed var(--ink-soft);background:rgba(255,255,255,.25);padding:15px;margin-bottom:18px;}
+  .form h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 11px;font-weight:600;}
+  .field{margin-bottom:10px;}
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:3px;}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--paper-line);background:var(--paper);font-family:inherit;font-size:16px;color:var(--ink);}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--loch);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row .field{flex:1;min-width:140px;}
+  .btn{padding:10px 18px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;}
+  .btn.ghost{background:transparent;color:var(--ink);}
+
+  .day{border-left:2px solid var(--paper-line);padding-left:17px;margin-left:5px;padding-bottom:22px;position:relative;}
+  .day::before{content:'';position:absolute;left:-6px;top:3px;width:10px;height:10px;background:var(--loch);border-radius:50%;}
+  .day.highlight::before{background:var(--trail);width:12px;height:12px;left:-7px;}
+  .day-num{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--loch);}
+  .day.highlight .day-num{color:var(--trail);}
+  .day-title{font-weight:600;font-size:15.5px;margin-top:1px;}
+  .day-date{font-size:12.5px;color:var(--trail);font-weight:600;margin-top:2px;}
+  .day-stay{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .day-items{margin-top:9px;}
+  .day-item{font-size:14.5px;padding:3px 0 3px 15px;position:relative;}
+  .day-item::before{content:'·';position:absolute;left:3px;color:var(--ink-soft);font-weight:700;}
+  .day-note{font-size:13px;color:var(--ink-soft);margin-top:7px;font-style:italic;}
+
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px;padding-top:16px;border-top:1px solid var(--paper-line);}
+  .empty{font-size:13.5px;color:var(--ink-soft);padding:18px;text-align:center;border:1px dashed var(--paper-line);}
+  .saved{font-size:12px;color:var(--moor);margin-top:10px;}
+  footer{text-align:center;font-size:11.5px;color:var(--ink-soft);margin-top:28px;padding-top:14px;border-top:1px solid var(--paper-line);}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+/* ============ DATA ============ */
+const BOOK_ITEMS = [
+  { id:'celebrant', title:'Celebrant for the pub vow renewal', deadline:'BY OCT 2026', dclass:'urgent',
+    desc:`Book <a href="https://thescottishcelebrant.com/" target="_blank" rel="noopener">The Scottish Celebrant</a> — kilts, banter, travels across the Highlands. Good ones book out a year-plus ahead.` },
+  { id:'car', title:'Rental car, Inverness → Edinburgh (one-way)', deadline:'BY JAN 2027', dclass:'urgent',
+    desc:`<a href="https://www.arnoldclarkrental.com" target="_blank" rel="noopener">Arnold Clark</a> or <a href="https://www.enterprise.co.uk" target="_blank" rel="noopener">Enterprise</a>. Pick up Inverness June 1, drop off Edinburgh June 5. Request an <b>automatic</b> — UK rentals default to manual and automatics sell out first.` },
+  { id:'skyelodging', title:'Portree / Skye lodging (3 beds), June 3–5', deadline:'BY JAN 2027', dclass:'soon',
+    desc:`2 nights, self-catering via <a href="https://www.airbnb.com" target="_blank" rel="noopener">Airbnb</a> or <a href="https://www.cottages.com" target="_blank" rel="noopener">Cottages.com</a>.` },
+  { id:'highlandslodging', title:'Inverness lodging (3 beds), June 1–3', deadline:'BY JAN 2027', dclass:'soon',
+    desc:`2 nights via <a href="https://www.airbnb.com" target="_blank" rel="noopener">Airbnb</a> or <a href="https://www.cottages.com" target="_blank" rel="noopener">Cottages.com</a>.` },
+  { id:'edinreturnlodging', title:'Edinburgh lodging (3 beds), June 5–6', deadline:'BY JAN 2027', dclass:'soon',
+    desc:`One night before the flight home. Could just extend at The Caledonian if they have space.` },
+  { id:'puffin', title:'Isle of May puffin boat trip, Mon May 31', deadline:'BY FEB 2027', dclass:'soon',
+    desc:`<a href="https://www.seabird.org/boats/isle-of-may-boat-trips" target="_blank" rel="noopener">Scottish Seabird Centre</a> (North Berwick) or <a href="https://www.isleofmayferry.com" target="_blank" rel="noopener">Isle of May Ferry</a> (Anstruther). Book the day the 2027 calendar opens, usually January.` },
+  { id:'pubreservation', title:`Table at MacGregor's Bar, Inverness`, deadline:'BY APR 2027', dclass:'soon',
+    desc:`109–113 Academy Street. <a href="https://www.visitinvernesslochness.com/listings/macgregors-bar-0" target="_blank" rel="noopener">Book a table</a> for the evening of June 2 — groups over 6 should email ahead.` },
+  { id:'trains', title:'ScotRail Advance tickets (Edinburgh–Inverness)', deadline:'EARLY MAR 2027', dclass:'soon',
+    desc:`<a href="https://www.scotrail.co.uk" target="_blank" rel="noopener">ScotRail</a>. Advance fares release ~12 weeks out — around <b>March 9, 2027</b> for the June 1 train.` },
+  { id:'highlandcow', title:'Highland cow croft tour, Tue June 1 (PM)', deadline:'BY APR 2027', dclass:'flex',
+    desc:`<a href="https://www.visitinvernesslochness.com/listings/highland-cow-tours-loch-ness-hub" target="_blank" rel="noopener">Loch Ness Hub</a>, Drumnadrochit — aim for an afternoon slot.` },
+  { id:'edincastle', title:'Edinburgh Castle timed tickets, Sun May 30', deadline:'BY APR 2027', dclass:'flex',
+    desc:`<a href="https://www.edinburghcastle.scot" target="_blank" rel="noopener">edinburghcastle.scot</a> — book ahead to skip the line.` },
+  { id:'edinzoo', title:'Edinburgh Zoo tickets, Sun May 30', deadline:'FLEXIBLE', dclass:'flex',
+    desc:`<a href="https://www.edinburghzoo.org.uk" target="_blank" rel="noopener">edinburghzoo.org.uk</a> — slightly cheaper online than at the gate.` },
+  { id:'flights', title:'Flights DFW ↔ Edinburgh', deadline:'BOOKED', dclass:'flex',
+    desc:`See the Confirmations tab for flight numbers.` },
+  { id:'edinlodging', title:'Edinburgh lodging, May 29 – June 1', deadline:'BOOKED', dclass:'flex',
+    desc:`The Caledonian Edinburgh — see Confirmations tab.` },
+  { id:'eileandonan', title:'Eilean Donan Castle photo-stop, Thu June 3', deadline:'NO BOOKING', dclass:'flex',
+    desc:`Free from the grounds and bridge; pay only to go inside. <a href="https://www.eileandonancastle.com" target="_blank" rel="noopener">Info</a>.` }
+];
+
+const SEED_CONFS = [
+  { id:'c1', name:'AA 78 — DFW → LHR', cat:'Flight', num:'AA 78', dates:'May 28, 2027 (overnight)', contact:'', notes:'Outbound transatlantic leg.' },
+  { id:'c2', name:'AA 7118 — LHR → EDI', cat:'Flight', num:'AA 7118', dates:'May 29, 2027', contact:'', notes:'Connecting leg. If booked on a separate ticket, bags need re-checking at Heathrow — worth confirming with AA.' },
+  { id:'c3', name:'AA 6884 — EDI → LHR', cat:'Flight', num:'AA 6884', dates:'June 6, 2027', contact:'', notes:'Return leg 1.' },
+  { id:'c4', name:'AA 79 — LHR → DFW', cat:'Flight', num:'AA 79', dates:'June 6, 2027', contact:'', notes:'Return leg 2.' },
+  { id:'c5', name:'The Caledonian Edinburgh', cat:'Lodging', num:'3540768675', dates:'May 29 – June 1, 2027', contact:'', notes:'3 nights. Covers the Edinburgh portion.' }
+];
+
+const DAYS = [
+  { day:1, date:'Fri, May 28, 2027', title:'Depart DFW', stay:null,
+    items:['AA 78 — DFW → LHR, overnight'], note:'Try to sleep on the plane.' },
+  { day:2, date:'Sat, May 29, 2027', title:'Arrive Edinburgh', stay:'The Caledonian Edinburgh',
+    items:['AA 7118 — LHR → EDI','Settle into the hotel','Stroll the Royal Mile','Castle esplanade view (free)','Early dinner, early night'],
+    note:'Deliberately light — jet lag day.' },
+  { day:3, date:'Sun, May 30, 2027', title:'Edinburgh: castle + first Highland cows', stay:'The Caledonian Edinburgh',
+    items:['Morning: Edinburgh Castle (timed entry)','Afternoon: Edinburgh Zoo — Highland cows, pandas, penguins','Free evening — dinner in the Grassmarket'] },
+  { day:4, date:'Mon, May 31, 2027', title:'Puffins at the Isle of May', stay:'The Caledonian Edinburgh',
+    items:['Train to North Berwick (~30 min)','Isle of May boat trip','Beach time in North Berwick','Train back to Edinburgh'],
+    note:'Peak puffin season — they leave by late July.' },
+  { day:5, date:'Tue, June 1, 2027', title:'To the Highlands + Highland cows', stay:'Inverness (night 1 of 2)',
+    items:['Check out of The Caledonian','Train Edinburgh → Inverness (~3.5 hrs, scenic)','Pick up the rental car in Inverness','Afternoon: Highland cow croft tour, Drumnadrochit'] },
+  { day:6, date:'Wed, June 2, 2027', title:'★ Vow renewal — 20 years', stay:'Inverness (night 2 of 2)', highlight:true,
+    items:['Open morning — downtime',`Evening: vow renewal at MacGregor's Bar, Inverness`,'Live traditional music, kilted celebrant'],
+    note:`The whole reason for the date. No paperwork needed — a vow renewal isn't a legal ceremony.` },
+  { day:7, date:'Thu, June 3, 2027', title:'Over to Skye', stay:'Portree, Skye (night 1 of 2)',
+    items:['Check out of Inverness','Photo-stop at Eilean Donan Castle','Over the Skye Bridge to Portree'] },
+  { day:8, date:'Fri, June 4, 2027', title:'Skye: pick your pace', stay:'Portree (night 2 of 2)',
+    items:['More: Old Man of Storr (moderate climb)','Less: Fairy Pools (easy streamside walk)','Regroup for dinner at Portree harbour'],
+    note:'Split the group if people want different things — both finish in time for dinner.' },
+  { day:9, date:'Sat, June 5, 2027', title:'Drive back to Edinburgh', stay:'Edinburgh',
+    items:['Check out of Portree','Drive Skye → Edinburgh (~5.5–6 hrs)','Route goes via Glencoe and Fort William — worth a stop','Drop the rental car in Edinburgh'],
+    note:'Long drive, but one of the prettiest stretches in the country.' },
+  { day:10, date:'Sun, June 6, 2027', title:'Fly home', stay:null,
+    items:['AA 6884 — EDI → LHR','AA 79 — LHR → DFW'] }
+];
+
+const STORAGE_KEY = 'scotland-2027';
+const DEFAULT_CHECKS = { flights:true, edinlodging:true };
+
+/* ============ PERSISTENCE ============ */
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      return {
+        checks: { ...DEFAULT_CHECKS, ...(d.checks||{}) },
+        confs: Array.isArray(d.confs) ? d.confs : SEED_CONFS
+      };
+    }
+  }catch(e){}
+  return { checks:{...DEFAULT_CHECKS}, confs:SEED_CONFS.slice() };
+}
+
+/* ============ COMPONENTS ============ */
+function Checklist({ checks, toggle }){
+  const done = BOOK_ITEMS.filter(b=>checks[b.id]).length;
+  const pct = Math.round(done/BOOK_ITEMS.length*100);
+  return (
+    <div>
+      <h2>Booking checklist</h2>
+      <div className="note">Sorted by how soon you need to move. Tap a box to check it off.</div>
+      <div className="progress-row">
+        <div className="progress-track"><div className="progress-fill" style={{width:pct+'%'}}/></div>
+        <div className="progress-label">{done} / {BOOK_ITEMS.length}</div>
+      </div>
+      {BOOK_ITEMS.map(b=>{
+        const on = !!checks[b.id];
+        return (
+          <div key={b.id} className={'book-card'+(on?' checked':'')}>
+            <div className={'check'+(on?' on':'')} onClick={()=>toggle(b.id)}>{on?'✓':''}</div>
+            <div className="book-body">
+              <div className="book-top">
+                <div className="book-title">{b.title}</div>
+                <div className={'deadline '+b.dclass}>{b.deadline}</div>
+              </div>
+              <div className="book-desc" dangerouslySetInnerHTML={{__html:b.desc}}/>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const CATS = ['Lodging','Flight','Car','Train','Activity','Other'];
+const CAT_ORDER = { Flight:1, Lodging:2, Car:3, Train:4, Activity:5, Other:6 };
+const BLANK = { name:'', cat:'Lodging', num:'', dates:'', contact:'', notes:'' };
+
+function Confirmations({ confs, setConfs }){
+  const [form, setForm] = useState(BLANK);
+  const [editingId, setEditingId] = useState(null);
+
+  const set = (k,v)=> setForm(f=>({...f,[k]:v}));
+
+  const submit = ()=>{
+    if(!form.name.trim()) return;
+    if(editingId){
+      setConfs(confs.map(c=>c.id===editingId?{...form,id:editingId}:c));
+    } else {
+      setConfs([...confs, {...form, id:'c'+Date.now()}]);
+    }
+    setForm(BLANK); setEditingId(null);
+  };
+
+  const startEdit = (c)=>{
+    setForm({name:c.name,cat:c.cat,num:c.num,dates:c.dates,contact:c.contact,notes:c.notes});
+    setEditingId(c.id);
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  const sorted = useMemo(()=>
+    confs.slice().sort((a,b)=>(CAT_ORDER[a.cat]||9)-(CAT_ORDER[b.cat]||9)), [confs]);
+
+  return (
+    <div>
+      <h2>Confirmations</h2>
+      <div className="note">Everything booked, in one place. Saves automatically.</div>
+
+      <div className="form">
+        <h3>{editingId?'Edit confirmation':'Add a confirmation'}</h3>
+        <div className="row">
+          <div className="field">
+            <label>What is it</label>
+            <input value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Portree cottage"/>
+          </div>
+          <div className="field">
+            <label>Category</label>
+            <select value={form.cat} onChange={e=>set('cat',e.target.value)}>
+              {CATS.map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="field">
+          <label>Confirmation number</label>
+          <input value={form.num} onChange={e=>set('num',e.target.value)} placeholder="e.g. 3540768675"/>
+        </div>
+        <div className="row">
+          <div className="field">
+            <label>Dates</label>
+            <input value={form.dates} onChange={e=>set('dates',e.target.value)} placeholder="e.g. June 3–5, 2027"/>
+          </div>
+          <div className="field">
+            <label>Phone / link (optional)</label>
+            <input value={form.contact} onChange={e=>set('contact',e.target.value)} placeholder="e.g. +44 ..."/>
+          </div>
+        </div>
+        <div className="field">
+          <label>Notes (optional)</label>
+          <textarea rows="2" value={form.notes} onChange={e=>set('notes',e.target.value)} placeholder="Check-in time, address, who booked it..."/>
+        </div>
+        <div style={{display:'flex',gap:9}}>
+          <button className="btn" onClick={submit}>{editingId?'Update':'Save'}</button>
+          {editingId && <button className="btn ghost" onClick={()=>{setForm(BLANK);setEditingId(null);}}>Cancel</button>}
+        </div>
+      </div>
+
+      {sorted.length===0
+        ? <div className="empty">Nothing saved yet. Add your first confirmation above.</div>
+        : sorted.map(c=>(
+          <div key={c.id} className="conf">
+            <div className="conf-head">
+              <div className="conf-title">{c.name}</div>
+              <div className="conf-cat">{c.cat}</div>
+            </div>
+            {c.num && <div className="conf-num">{c.num}</div>}
+            {c.dates && <div className="conf-meta">{c.dates}</div>}
+            {c.contact && <div className="conf-meta">{c.contact}</div>}
+            {c.notes && <div className="conf-meta">{c.notes}</div>}
+            <div className="conf-actions">
+              <button className="mini" onClick={()=>startEdit(c)}>Edit</button>
+              <button className="mini" onClick={()=>setConfs(confs.filter(x=>x.id!==c.id))}>Delete</button>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  );
+}
+
+function Itinerary(){
+  return (
+    <div>
+      <h2>Day by day</h2>
+      <div className="note">What's happening, where you're sleeping.</div>
+      {DAYS.map(d=>(
+        <div key={d.day} className={'day'+(d.highlight?' highlight':'')}>
+          <div className="day-num">Day {d.day}</div>
+          <div className="day-title">{d.title}</div>
+          <div className="day-date">{d.date}</div>
+          {d.stay && <div className="day-stay">Sleeping: {d.stay}</div>}
+          <div className="day-items">
+            {d.items.map((i,n)=><div key={n} className="day-item">{i}</div>)}
+          </div>
+          {d.note && <div className="day-note">{d.note}</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App(){
+  const initial = useMemo(loadState, []);
+  const [tab, setTab] = useState('checklist');
+  const [checks, setChecks] = useState(initial.checks);
+  const [confs, setConfs] = useState(initial.confs);
+
+  useEffect(()=>{
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({checks,confs})); }catch(e){}
+  }, [checks, confs]);
+
+  const toggle = id => setChecks(c=>({...c,[id]:!c[id]}));
+
+  const daysOut = useMemo(()=>{
+    const diff = Math.ceil((new Date('2027-05-28') - new Date())/86400000);
+    return diff>0 ? diff : null;
+  },[]);
+
+  const exportData = ()=>{
+    const blob = new Blob([JSON.stringify({checks,confs},null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='scotland-2027-backup.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const importData = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{
+      try{
+        const d = JSON.parse(r.result);
+        if(d.checks) setChecks({...DEFAULT_CHECKS, ...d.checks});
+        if(Array.isArray(d.confs)) setConfs(d.confs);
+      }catch(err){ alert('That file could not be read.'); }
+    };
+    r.readAsText(f);
+    e.target.value='';
+  };
+
+  return (
+    <div className="wrap">
+      <header>
+        <div className="kicker">MAY 28 – JUNE 6, 2027 · 2 ADULTS + 2 KIDS</div>
+        <h1>Scotland 2027</h1>
+        <div className="subtitle">20th anniversary trip — Edinburgh, Inverness, Skye.</div>
+        {daysOut && <div className="countdown">{daysOut} days to go</div>}
+      </header>
+
+      <div className="tabs">
+        {[['checklist','Checklist'],['confirmations','Confirmations'],['itinerary','Itinerary']].map(([k,label])=>(
+          <button key={k} className={'tab'+(tab===k?' active':'')}
+            onClick={()=>{setTab(k); window.scrollTo({top:0,behavior:'smooth'});}}>{label}</button>
+        ))}
+      </div>
+
+      {tab==='checklist' && <Checklist checks={checks} toggle={toggle}/>}
+      {tab==='confirmations' && <Confirmations confs={confs} setConfs={setConfs}/>}
+      {tab==='itinerary' && <Itinerary/>}
+
+      <div className="toolbar">
+        <button className="btn ghost" onClick={exportData}>Export backup</button>
+        <label className="btn ghost" style={{cursor:'pointer'}}>
+          Import backup
+          <input type="file" accept="application/json" onChange={importData} style={{display:'none'}}/>
+        </label>
+      </div>
+      <div className="saved">Saves automatically on this device.</div>
+
+      <footer>Scotland 2027</footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
